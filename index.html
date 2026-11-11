@@ -5,54 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Code Lens</title>
 <script src="https://cdn.jsdelivr.net/npm/acorn@8.12.1/dist/acorn.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bangers@5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/comic-neue@5/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/comic-neue@5/400.css">
 <style>
-:root{--bg:#f6f5f1;--card:#ffffff;--ink:#1c2230;--muted:#5b6474;--line:#e3e1da;--accent:#c2410c;--soft:#fff1e6;--blue:#1d4ed8;--blueSoft:#e8efff;--code:#f3f2ee}
+:root{--paper:#fffbea;--ink:#111111;--muted:#3d3d3d;--red:#e63946;--yellow:#ffd60a;--blue:#1e6fff;--cyan:#9fe7ff;--pink:#ffb3c7;--code:#ffffff}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:760px;margin:0 auto;padding:12px 16px 80px}
-h1{font-size:24px;margin:8px 0 2px}
-header p{margin:0;color:var(--muted);font-size:15px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0}
-label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+html,body{margin:0;color:var(--ink)}
+body{font:17px/1.5 "Comic Neue","Comic Sans MS","Chalkboard SE",system-ui,sans-serif;background-color:var(--paper);background-image:radial-gradient(#f2c94c 1.3px,transparent 1.4px);background-size:12px 12px}
+.wrap{max-width:760px;margin:0 auto;padding:14px 16px 80px}
+header{position:relative;background:var(--yellow);border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:12px 14px 14px;margin:6px 6px 18px 0;transform:rotate(-1deg)}
+h1{font:400 46px/1 Bangers,Impact,"Arial Black",sans-serif;letter-spacing:2px;margin:0;color:var(--red);-webkit-text-stroke:2px var(--ink);text-shadow:4px 4px 0 var(--ink)}
+header p{margin:8px 0 0;font-weight:700;font-size:15px}
+.card{background:#fff;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);border-radius:4px;padding:14px;margin:16px 6px 16px 0}
+label{display:block;font:400 18px Bangers,Impact,sans-serif;letter-spacing:1px;color:var(--ink);margin:12px 0 4px}
 input,select,textarea,button{font:inherit}
-input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+input,select,textarea{width:100%;padding:10px;border:3px solid var(--ink);border-radius:4px;background:#fff;color:var(--ink);font-weight:700}
 textarea{min-height:170px;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
-.row{display:flex;gap:8px}
+.row{display:flex;gap:10px}
 .row input{flex:1;min-width:0}
-button{padding:10px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
-button.ghost{background:#fff;color:var(--accent)}
-.tabs{display:flex;gap:6px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
-.tabs button{flex:1;background:#fff;color:var(--ink);border-color:var(--line)}
-.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.status{font-size:14px;color:var(--muted);min-height:20px;margin-top:8px}
-.status.err{color:#b91c1c}
+button{padding:8px 16px;border:3px solid var(--ink);border-radius:4px;background:var(--red);color:#fff;font:400 20px Bangers,Impact,sans-serif;letter-spacing:1.5px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);text-shadow:1px 1px 0 var(--ink)}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+button.ghost{background:var(--cyan);color:var(--ink);text-shadow:none}
+.tabs{display:flex;gap:8px;position:sticky;top:0;background:var(--paper);padding:10px 6px 10px 0;z-index:5;border-bottom:3px solid var(--ink)}
+.tabs button{flex:1;background:#fff;color:var(--ink);text-shadow:none}
+.tabs button.on{background:var(--blue);color:#fff;text-shadow:1px 1px 0 var(--ink);transform:rotate(-2deg)}
+.status{font-weight:700;font-size:15px;min-height:20px;margin-top:10px}
+.status.err{color:var(--red)}
 .hidden{display:none}
-.fn{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);margin:8px 0;font-weight:400;padding:10px 12px}
-.fn .nm{font:600 15px ui-monospace,Menlo,Consolas,monospace;color:var(--ink);word-break:break-all}
-.fn.top{background:var(--soft);border-color:#f3c9ad}
-.meta{font-size:13px;color:var(--muted)}
-.note{background:var(--soft);border:1px solid #f3c9ad;border-radius:8px;padding:8px 10px;font-size:14px;margin:8px 0}
-.step{display:grid;grid-template-columns:40px 1fr;gap:0 8px;padding:8px 0 8px 6px;border-top:1px solid var(--line)}
-.step.d{border-left:3px solid #f1d3bf}
-.ln{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--muted);text-align:right;padding-top:4px}
-.code{font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;background:var(--code);border-radius:6px;padding:6px 8px;white-space:pre-wrap;word-break:break-word}
-.say{margin-top:5px;font-size:15px}
-.lab{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;padding:8px 0 2px 6px;border-left:3px solid #f1d3bf}
-a.jump{color:var(--blue);cursor:pointer;text-decoration:underline}
-details{border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:6px 0;background:#fffdf9}
-summary{cursor:pointer;font-weight:600}
-.fname{font:700 18px ui-monospace,Menlo,Consolas,monospace;word-break:break-all;margin:0 0 6px}
-.links{font-size:14px;margin:6px 0}
+.fn{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);margin:12px 0;padding:10px 12px;font:inherit;text-shadow:none;letter-spacing:0}
+.fn:nth-child(odd){transform:rotate(-.4deg)}
+.fn:nth-child(even){transform:rotate(.4deg)}
+.fn .nm{font:700 16px ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
+.fn.top{background:var(--yellow)}
+.meta{font-size:14px;color:var(--muted);font-weight:700}
+.note{background:var(--pink);border:3px solid var(--ink);padding:8px 10px;font-weight:700;margin:10px 0;box-shadow:3px 3px 0 var(--ink)}
+.step{display:grid;grid-template-columns:40px 1fr;gap:0 10px;padding:12px 0 6px}
+.step.d{border-left:4px dashed var(--ink);padding-left:8px}
+.ln{font:400 18px Bangers,Impact,sans-serif;background:var(--red);color:#fff;border:2px solid var(--ink);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:15px;align-self:start}
+.code{font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;background:#fff;border:3px solid var(--ink);padding:6px 8px;white-space:pre-wrap;word-break:break-word;box-shadow:3px 3px 0 var(--ink)}
+.say{position:relative;margin:16px 0 4px;padding:8px 12px;background:#fff;border:3px solid var(--ink);border-radius:18px;font-weight:700;font-size:16px}
+.say:before{content:"";position:absolute;top:-14px;left:22px;border:7px solid transparent;border-bottom:7px solid var(--ink);border-left:7px solid var(--ink)}
+.say:after{content:"";position:absolute;top:-7px;left:25px;border:4px solid transparent;border-bottom:4px solid #fff;border-left:4px solid #fff}
+.lab{display:inline-block;font:400 17px Bangers,Impact,sans-serif;letter-spacing:1.5px;background:var(--yellow);border:3px solid var(--ink);padding:2px 10px;margin:12px 0 2px;box-shadow:2px 2px 0 var(--ink)}
+a.jump{color:var(--blue);cursor:pointer;text-decoration:underline;text-decoration-thickness:2px}
+details{border:3px solid var(--ink);padding:6px 10px;margin:8px 0;background:var(--cyan);box-shadow:3px 3px 0 var(--ink)}
+details[open]{background:#fff}
+summary{cursor:pointer;font:400 19px Bangers,Impact,sans-serif;letter-spacing:1px}
+.fname{font:700 19px ui-monospace,Menlo,Consolas,monospace;word-break:break-all;margin:0 0 8px;background:var(--yellow);display:inline-block;padding:2px 8px;border:3px solid var(--ink)}
+.links{font-size:15px;margin:8px 0;font-weight:700}
+.burst{float:right;font:400 22px Bangers,Impact,sans-serif;color:#fff;background:var(--red);border:3px solid var(--ink);padding:10px 12px;margin:-28px -24px 6px 8px;transform:rotate(8deg);clip-path:polygon(50% 0,61% 22%,85% 8%,78% 35%,100% 42%,80% 58%,96% 82%,68% 76%,58% 100%,45% 78%,22% 96%,24% 70%,0 62%,18% 47%,4% 22%,30% 26%);padding:22px 24px;text-shadow:2px 2px 0 var(--ink)}
 #mapBox{overflow-x:hidden}
-svg text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-svg g[data-fn]{cursor:pointer}
+svg text{font-family:"Comic Neue","Comic Sans MS",system-ui,sans-serif}
+svg .hd{font-family:Bangers,Impact,sans-serif;letter-spacing:1px}
+svg g[data-fn],svg g[data-top]{cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
-<h1>Code Lens</h1>
+<h1>CODE LENS!</h1>
 <p>Pick one of your GitHub projects. Code Lens reads the code and explains every function in plain English, step by step, using code you already wrote.</p>
 </header>
 
@@ -845,10 +857,11 @@ function openTop(i) {
   var text = 'These lines sit outside every function, so the browser runs them once, top to bottom, as soon as it reads this script. Function definitions here do not run yet. They just get set up so other code can call them.' + (works.length ? ' This part works with ' + listWords(works) + '.' : '');
   renderExplain('Top level code' + (S.A.scripts.length > 1 ? ' (script ' + (i + 1) + ')' : ''), text, 'load', info.c, rows);
 }
+var BURSTS = ['POW!', 'ZAP!', 'BAM!', 'WHAM!', 'KAPOW!', 'BOOM!', 'ZOOM!', 'BLAM!'];
 function renderExplain(title, summary, id, concepts, rows) {
   var A = S.A;
   var by = (A.inn[id] || []).map(nodeLabel), calls = (A.out[id] || []).map(nodeLabel);
-  var h = '<div class="card"><div class="fname">' + esc(title) + '</div><div>' + rich(summary) + '</div>';
+  var h = '<div class="card"><div class="burst">' + BURSTS[Math.floor(Math.random() * BURSTS.length)] + '</div><div class="fname">' + esc(title) + '</div><div>' + rich(summary) + '</div>';
   if (id !== 'load') h += '<div class="links"><span class="meta">Started by: </span>' + (by.length ? rich(listWords(by)) : 'nothing this tool could find in this file (it may be called from another file, or not used)') + '</div>';
   h += '<div class="links"><span class="meta">Runs these of your functions: </span>' + (calls.length ? rich(listWords(calls)) : 'none') + '</div></div>';
   var ck = Object.keys(concepts);
@@ -898,12 +911,12 @@ function renderMap() {
     y += Math.ceil(g.length / cols) * (nh + gap) + 14;
   });
   var H = y + 10, sel = S.sel;
-  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker><marker id="arS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1d4ed8"/></marker></defs>';
-  heads.forEach(function (hd) { s += '<text x="0" y="' + hd.y + '" font-size="12" font-weight="700" fill="#c2410c">' + esc(hd.t.toUpperCase()) + '</text>'; });
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#111"/></marker><marker id="arS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1e6fff"/></marker></defs>';
+  heads.forEach(function (hd) { s += '<text class="hd" x="0" y="' + hd.y + '" font-size="16" fill="#e63946" stroke="#111" stroke-width=".6">' + esc(hd.t.toUpperCase()) + '</text>'; });
   A.edges.forEach(function (e) {
     var p = e.split('>'), a = pos[p[0]], b = pos[p[1]]; if (!a || !b) return;
     var on = sel && (p[0] === sel || p[1] === sel);
-    var st = on ? 'stroke="#1d4ed8" stroke-width="2" opacity="1"' : 'stroke="#64748b" stroke-width="1.2" opacity="' + (sel ? 0.18 : 0.45) + '"';
+    var st = on ? 'stroke="#1e6fff" stroke-width="3" opacity="1"' : 'stroke="#111" stroke-width="2" opacity="' + (sel ? 0.15 : 0.5) + '"';
     var mk = on ? 'url(#arS)' : 'url(#ar)', d;
     if (b.y > a.y + nh / 2) {
       var x1 = a.x + nw / 2, y1 = a.y + nh, x2 = b.x + nw / 2, y2 = b.y, my = (y1 + y2) / 2;
@@ -920,13 +933,13 @@ function renderMap() {
   order.forEach(function (id) {
     var n = nodes[id], p = pos[id]; if (!p) return;
     var isSel = id === sel, f = fnById(id);
-    var fill = isSel ? '#e8efff' : n.kind === 'trig' ? '#fff1e6' : '#ffffff', stroke = isSel ? '#1d4ed8' : n.kind === 'trig' ? '#c2410c' : '#94a3b8';
+    var fill = isSel ? '#9fe7ff' : n.kind === 'trig' ? '#ffd60a' : '#ffffff', stroke = '#111';
     var lab = n.label.length > maxC ? n.label.slice(0, maxC - 3) + '...' : n.label;
     var sub = f ? 'line ' + f.line : n.kind === 'trig' ? (id === 'load' ? 'top level code' : 'event') : '';
     var attr = f ? ' data-fn="' + id + '"' : id === 'load' ? ' data-top="0"' : '';
-    s += '<g' + attr + '><rect x="' + p.x + '" y="' + p.y + '" width="' + nw + '" height="' + nh + '" rx="8" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (isSel ? 2 : 1.2) + '"/>';
-    s += '<text x="' + (p.x + 8) + '" y="' + (p.y + 19) + '" font-size="13" font-weight="600" fill="#1c2230">' + esc(lab) + '</text>';
-    s += '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-size="11" fill="#5b6474">' + esc(sub) + '</text></g>';
+    s += '<g' + attr + '><rect x="' + (p.x + 4) + '" y="' + (p.y + 4) + '" width="' + (nw - 4) + '" height="' + (nh - 4) + '" fill="#111"/><rect x="' + p.x + '" y="' + p.y + '" width="' + (nw - 4) + '" height="' + (nh - 4) + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (isSel ? 3.5 : 2.5) + '"/>';
+    s += '<text x="' + (p.x + 8) + '" y="' + (p.y + 19) + '" font-size="14" font-weight="700" fill="#111">' + esc(lab) + '</text>';
+    s += '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-size="11" font-weight="700" fill="#3d3d3d">' + esc(sub) + '</text></g>';
   });
   s += '</svg>';
   box.innerHTML = '<div class="meta" style="margin-bottom:8px">Arrows point from what starts something to what it runs. Dashed arrows loop back up. Tap a box to explain it.</div>' + s;
